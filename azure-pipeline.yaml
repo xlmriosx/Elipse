@@ -1,21 +1,57 @@
+# Docker
+# Build and push an image to Azure Container Registry
+# https://docs.microsoft.com/azure/devops/pipelines/languages/docker
+
 trigger:
 - main
 
-pool:
-  vmImage: 'ubuntu-latest'
+resources:
+- repo: self
 
 variables:
-  buildConfiguration: 'Release'
+  # Container registry service connection established during pipeline creation
+  dockerRegistryServiceConnection: '8c54346d-1853-4c37-b92b-772903dda648'
+  imageRepository: 'chatnet'
+  containerRegistry: 'elipse.azurecr.io'
+  dockerfilePath: '$(Build.SourcesDirectory)/Elipse/Dockerfile'
+  tag: '$(Build.BuildId)'
 
-steps:
-- task: DotNetCoreCLI@2
-  inputs:
-    command: 'restore'
-    feedsToUse: 'select'
-    vstsFeed: 'my-vsts-feed' # A series of numbers and letters
+  # Agent VM image name
+  vmImageName: 'ubuntu-latest'
 
-- task: DotNetCoreCLI@2
-  inputs:
-    command: 'build'
-    arguments: '--configuration $(buildConfiguration)'
-  displayName: 'dotnet build $(buildConfiguration)'
+stages:
+- stage: Test
+  displayName: Test stage
+  jobs:  
+  - job: Test
+    displayName: Test
+    pool:
+      vmImage: $(vmImageName)
+    steps:
+    # ...
+    # do this after other tasks such as building
+    - task: DotNetCoreCLI@2
+      inputs:
+        command: test
+        projects: '**/*Tests/*.csproj'
+        arguments: '--configuration $(buildConfiguration)'
+    
+    - script: echo "Migrating data"
+      displayName: Migrations
+
+    - task: Docker@2
+      displayName: Build and push an image to container registry
+      inputs:
+        command: buildAndPush
+        repository: $(imageRepository)
+        dockerfile: $(dockerfilePath)
+        containerRegistry: $(dockerRegistryServiceConnection)
+        tags: |
+          $(tag)
+          latest
+    
+    - script: echo "Migrating data"
+      displayName: Migrations
+          
+    - upload: manifests
+      artifact: manifests
