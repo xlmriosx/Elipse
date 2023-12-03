@@ -35,6 +35,9 @@ stages:
         command: test
         projects: '**/*Tests/*.csproj'
         arguments: '--configuration $(buildConfiguration)'
+    
+    - script: echo "Migrating data"
+      displayName: Migrations
 
 - stage: Build
   displayName: Build stage
@@ -55,6 +58,9 @@ stages:
         tags: |
           $(tag)
           latest
+    
+    - script: echo "Migrating data"
+      displayName: Migrations
           
     - upload: manifests
       artifact: manifests
