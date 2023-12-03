@@ -38,3 +38,16 @@ stages:
         tags: |
           $(tag)
 
+- stage: Migrations
+  jobs:
+  - job: Migrations
+    steps:
+    - script: echo Migrating data!
+
+- stage: Deploy
+  jobs:
+  - job: Deploy
+    steps:
+    - script: echo Deploying the code!
+    
+
