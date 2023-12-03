@@ -51,14 +51,6 @@ stages:
     displayName: Deploy
     pool:
       vmImage: $(vmImageName)
-    environment: 'groffedemosASPNET5Preview7RESTAPIDocker.azuredevops-0'
-    strategy:
-      runOnce:
-        deploy:
-          steps:
-          - task: KubernetesManifest@0
-            displayName: Create imagePullSecret
-            inputs:
-              action: createSecret
-              secretName: $(imagePullSecret)
-              dockerRegistryEndpoint: $(dockerRegistryServiceConnection)
+    steps:
+    - script: echo "Migrating data"
+      displayName: Migrations
