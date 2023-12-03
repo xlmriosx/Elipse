@@ -1,0 +1,34 @@
+# If sudo docker compose up --build -d, not works run sudo snap refresh docker --channel=latest/edge
+version: '3.8'
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: elipse
+    ports:
+      - "8080:5000"
+    environment:
+      ASPNETCORE_ENVIRONMENT: "Production"
+      ConnectionStrings__DefaultConnection: "Server=db;Database=${DATABASE_NAME};User Id=${DB_USER};Password=${DB_PASSWORD};"
+    depends_on:
+      - db
+    networks:
+      - elipse-net
+
+  db:
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    container_name: mssql-server
+    environment:
+      SA_PASSWORD: "${DB_SA_PASSWORD}"
+      ACCEPT_EULA: "Y"
+      MSSQL_PID: "Express"
+    ports:
+      - "1433:1433"
+    networks:
+      - elipse-net
+
+networks:
+  elipse-net:
+    driver: bridge
