@@ -21,8 +21,8 @@ variables:
 
 stages:
 - stage: Build
-  displayName: Build and push stage
-  jobs:
+  displayName: Build stage
+  jobs:  
   - job: Build
     displayName: Build
     pool:
@@ -37,17 +37,28 @@ stages:
         containerRegistry: $(dockerRegistryServiceConnection)
         tags: |
           $(tag)
-
-- stage: Migrations
-  jobs:
-  - job: Migrations
-    steps:
-    - script: echo Migrating data!
+          latest
+          
+    - upload: manifests
+      artifact: manifests
 
 - stage: Deploy
-  jobs:
-  - job: Deploy
-    steps:
-    - script: echo Deploying the code!
-    
+  displayName: Deploy stage
+  dependsOn: Build
 
+  jobs:
+  - deployment: Deploy
+    displayName: Deploy
+    pool:
+      vmImage: $(vmImageName)
+    environment: 'groffedemosASPNET5Preview7RESTAPIDocker.azuredevops-0'
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - task: KubernetesManifest@0
+            displayName: Create imagePullSecret
+            inputs:
+              action: createSecret
+              secretName: $(imagePullSecret)
+              dockerRegistryEndpoint: $(dockerRegistryServiceConnection)
