@@ -22,5 +22,6 @@ RUN dotnet publish "Elipse.csproj" -c Release -o /app/publish
 # Build runtime image
 FROM base AS final
 WORKDIR /app
+ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=true
 COPY --from=publish /app/publish .
 ENTRYPOINT ["dotnet", "Elipse.dll"]
