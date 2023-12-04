@@ -48,8 +48,7 @@ jobs:
         password: ${{ secrets.SRV_PASSWORD_AMV }}
         port: ${{ secrets.SRV_PORT_AMV }}
         script: |
-          sudo snap install helm --classic &&
-          sudo kubectl config view --raw > ~/.kube/config
+          sudo snap install helm --classic
   
   ingress:
     needs: [helm]
