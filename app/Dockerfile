@@ -23,5 +23,6 @@ RUN dotnet publish "Elipse.csproj" -c Release -o /app/publish
 FROM base AS final
 WORKDIR /app
 ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=true
+RUN dotnet dev-certs https
 COPY --from=publish /app/publish .
 ENTRYPOINT ["dotnet", "Elipse.dll"]
