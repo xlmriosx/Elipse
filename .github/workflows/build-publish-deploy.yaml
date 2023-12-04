@@ -195,8 +195,7 @@ jobs:
             helm upgrade --install ${{ env.SERVICE }} . -n devops-${{ steps.vars.outputs.branch }} -f values-${{ steps.vars.outputs.branch }}.yaml --create-namespace --force
 
             cd /home/${{ secrets.SRV_USER_AMV }}/${{ github.event.repository.name }}/manifests/vars  && \
-            kubectl apply -f secret-${{ steps.vars.outputs.branch }}.yaml -n devops-${{ steps.vars.outputs.branch }} && \
-            kubectl apply -f configmap-${{ steps.vars.outputs.branch }}.yaml -n devops-${{ steps.vars.outputs.branch }}
+            kubectl apply -f secret-${{ steps.vars.outputs.branch }}.yaml -n devops-${{ steps.vars.outputs.branch }}
 
       - name: "Notify status of failure job"
         if: ${{ failure() }}

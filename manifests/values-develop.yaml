@@ -15,6 +15,13 @@ image:
   readinessProbe: /swagger/index.html
   secret: acr-cred-develop
 
+secrets:
+  - name: APP_KEY
+    key: APP_KEY
+  - name: MYSQL_USER
+    key: MYSQL_USER
+  - name: MYSQL_PASSWORD
+    key: MYSQL_PASSWORD
 
 imagePullSecrets: ""
 nameOverride: "chatnet"
