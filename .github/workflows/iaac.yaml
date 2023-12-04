@@ -24,7 +24,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     # Setting permissions
-    - name: "Setting up requirements to database 🧰"
+    - name: "Setting up k3s 🔱"
       uses: appleboy/ssh-action@v1.0.0
       with:
         host: ${{ secrets.SRV_IP_AMV }}
@@ -40,7 +40,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     # Setting permissions
-    - name: "Setting up requirements to database 🧰"
+    - name: "Setting up helm 🕸"
       uses: appleboy/ssh-action@v1.0.0
       with:
         host: ${{ secrets.SRV_IP_AMV }}
@@ -48,15 +48,15 @@ jobs:
         password: ${{ secrets.SRV_PASSWORD_AMV }}
         port: ${{ secrets.SRV_PORT_AMV }}
         script: |
-          snap install helm --classic &&
-          kubectl config view --raw > ~/.kube/config
+          sudo snap install helm --classic &&
+          sudo kubectl config view --raw > ~/.kube/config
   
   ingress:
     needs: [helm]
     runs-on: ubuntu-latest
     steps:
     # Setting permissions
-    - name: "Setting up requirements to database 🧰"
+    - name: "Setting up ingress 📥"
       uses: appleboy/ssh-action@v1.0.0
       with:
         host: ${{ secrets.SRV_IP_AMV }}
@@ -64,8 +64,8 @@ jobs:
         password: ${{ secrets.SRV_PASSWORD_AMV }}
         port: ${{ secrets.SRV_PORT_AMV }}
         script: |
-          helm upgrade --install ingress-nginx ingress-nginx \
+          sudo helm upgrade --install ingress-nginx ingress-nginx \
             --repo https://kubernetes.github.io/ingress-nginx \
             --namespace ingress-nginx --create-namespace &&
-          kubectl config view --raw > ~/.kube/config
+          sudo kubectl config view --raw > ~/.kube/config
   
