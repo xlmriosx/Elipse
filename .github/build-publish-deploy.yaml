@@ -1,0 +1,225 @@
+name: build-publish-deploy
+
+# This workflow uses actions that are not certified by GitHub.
+# They are provided by a third-party and are governed by
+# separate terms of service, privacy policy, and support
+# documentation.
+
+on:
+  push:
+    branches: ["develop", "qa", "main"]
+    # Publish semver tags as releases.
+    tags: ["v*.*.*"]
+  pull_request:
+    branches: ["develop", "qa", "main"]
+  workflow_dispatch:
+    inputs:
+      # Allow manual triggering of a workflow run.
+      # This is useful for testing and debugging.
+      manual_trigger:
+        description: "Trigger a workflow seeder run manually"
+        required: false
+        default: "false"
+
+env:
+  SERVER: elipse.azurecr.io
+  ACR_USERNAME: Elipse
+  IMAGE: ChatNet
+  VERSION: "${{ github.sha }}"
+
+jobs:
+  build-push-image:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/develop' || 'refs/heads/qa' || 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: "Testing app before build 🔨"
+        if: github.ref == 'refs/heads/develop'
+        shell: bash
+        run: |
+          # Testing app 
+          cd app && dotnet test
+
+      - name: "Docker hub repository login 💠"
+        if: github.ref == 'refs/heads/develop'
+        uses: azure/docker-login@v1
+        with:
+          login-server: ${{ env.SERVER }} # default: index.docker.io
+          username: ${{ env.ACR_USERNAME }}
+          password: ${{ secrets.ACR_PASSWORD }}
+
+      - name: "Compose Customized Docker Develop Image and push it 🐳"
+        if: github.ref == 'refs/heads/develop'
+        shell: bash
+        run: |
+          # Building image with binaries 
+          cd app && docker build . -t ${{ env.SERVER }}/${{ env.ACR_USERNAME }}/${{ env.IMAGE }}:${{ github.sha }}
+          # Pushing image to repository
+          docker push ${{ env.SERVER }}/${{ env.ACR_USERNAME }}/${{ env.IMAGE }}:${{ github.sha }}
+
+      - name: "Notify status of failure job"
+        if: ${{ failure() }}
+        run: |
+          curl -X POST -H "Content-Type: application/json" \
+          -d '{"content": "Something in build or push of image 📸 ${{ env.SERVER }}/${{ env.USER }}/${{ env.IMAGE }}:${{ github.sha }} was wrong! 🐳\nStatus: `${{ job.status }}` 💥👻 \nAutor: @${{ github.actor }} \nLink: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"}' \
+          ${{ secrets.WEBHOOK_URL }}
+
+  schema-migration:
+    runs-on: ubuntu-latest
+    needs: [build-push-image]
+    steps:
+      - name: "Migrations with new image 🦅"
+        shell: bash
+        run: |
+          echo "Here will apply all schema migrations to each environment"
+      - name: "Applying migrations with new image 🦅"
+        if: github.ref == 'refs/heads/develop'
+        shell: bash
+        run: |
+          echo "Some apps have an own method to manage schema-migrations of database that step will be here"
+      - name: "Applying migrations with new image 🦅"
+        if: github.ref == 'refs/heads/qa'
+        shell: bash
+        run: |
+          echo "Some apps have an own method to manage schema-migrations of database that step will be here"
+      - name: "Applying migrations with new image 🦅"
+        if: github.ref == 'refs/heads/main'
+        shell: bash
+        run: |
+          echo "Some apps have an own method to manage schema-migrations of database that step will be here"
+
+      - name: "Notify status of failure job"
+        if: ${{ failure() }}
+        run: |
+          curl -X POST -H "Content-Type: application/json" \
+          -d '{"content": "Something in migration of image 📸 ${{ env.SERVER }}/${{ env.USER }}/${{ env.IMAGE }}:${{ github.sha }} was wrong! 🦅\nStatus: `${{ job.status }}` 💥👻 \nAutor: @${{ github.actor }} \nLink: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"}' \
+          ${{ secrets.WEBHOOK_URL }}
+
+  data-migration:
+    runs-on: ubuntu-latest
+    needs: [schema-migration]
+    steps:
+      - name: "Migrations with new image 🦅"
+        shell: bash
+        run: |
+          echo "Here will apply all data migrations to each environment"
+      - name: "Applying migrations with new image 🦅"
+        if: github.ref == 'refs/heads/develop'
+        shell: bash
+        run: |
+          echo "Some apps have an own method to manage data-migrations of database that step will be here"
+      - name: "Applying migrations with new image 🦅"
+        if: github.ref == 'refs/heads/qa'
+        shell: bash
+        run: |
+          echo "Some apps have an own method to manage data-migrations of database that step will be here"
+      - name: "Applying migrations with new image 🦅"
+        if: github.ref == 'refs/heads/main'
+        shell: bash
+        run: |
+          echo "Some apps have an own method to manage data-migrations of database that step will be here"
+
+      - name: "Notify status of failure job"
+        if: ${{ failure() }}
+        run: |
+          curl -X POST -H "Content-Type: application/json" \
+          -d '{"content": "Something in migration of image 📸 ${{ env.SERVER }}/${{ env.USER }}/${{ env.IMAGE }}:${{ github.sha }} was wrong! 🦅\nStatus: `${{ job.status }}` 💥👻 \nAutor: @${{ github.actor }} \nLink: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"}' \
+          ${{ secrets.WEBHOOK_URL }}
+  
+  flyway:
+    runs-on: ubuntu-latest
+    needs: [data-migration]
+    steps:
+      - name: "Migrations with flyway 🦅"
+        shell: bash
+        run: |
+          echo "Here will apply all data migrations to each environment. if inspect in code of build-publish-deploy.yaml can you see how likes this commands"
+
+  # data-migration:
+  #   runs-on: ubuntu-latest
+  #   needs: [schema-migration]
+  #   container: xlmriosx/flyway
+  #   steps:
+  #     - uses: actions/checkout@v3
+
+  #     - name: Applying flyway to develop
+  #       if: github.ref == 'refs/heads/develop'
+  #       run: |
+  #         flyway info -locations=filesystem:newsie/database/flyway -url="jdbc:sqlserver://${{ env.develop_SQL_HOST }}:${{ env.develop_SQL_PORT }}/${{ env.develop_SQL_DB_NAME }}" -user=${{ secrets.SQL_ROOT_USR }} -password=${{ secrets.SQL_ROOT_PSW }}
+  #         flyway migrate -locations=filesystem:newsie/database/flyway -url="sqlserver:SQL://${{ env.develop_SQL_HOST }}:${{ env.develop_SQL_PORT }}/${{ env.develop_SQL_DB_NAME }}" -user=${{ secrets.SQL_ROOT_USR }} -password=${{ secrets.SQL_ROOT_PSW }} -baselineOnMigrate="true"
+  #         flyway info -locations=filesystem:newsie/database/flyway -url="jdbc:sqlserver://${{ env.develop_SQL_HOST }}:${{ env.develop_SQL_PORT }}/${{ env.develop_SQL_DB_NAME }}" -user=${{ secrets.SQL_ROOT_USR }} -password=${{ secrets.SQL_ROOT_PSW }}
+
+  #     - name: Applying flyway to qa
+  #       if: github.ref == 'refs/heads/qa'
+  #       run: |
+  #         flyway info -locations=filesystem:newsie/database/flyway -url="jdbc:sqlserver://${{ env.qa_SQL_HOST }}:${{ env.qa_SQL_PORT }}/${{ env.qa_SQL_DB_NAME }}" -user=${{ secrets.SQL_ROOT_USR }} -password=${{ secrets.SQL_ROOT_PSW }}
+  #         flyway migrate -locations=filesystem:newsie/database/flyway -url="jdbc:sqlserver://${{ env.qa_SQL_HOST }}:${{ env.qa_SQL_PORT }}/${{ env.qa_SQL_DB_NAME }}" -user=${{ secrets.SQL_ROOT_USR }} -password=${{ secrets.SQL_ROOT_PSW }} -baselineOnMigrate="true"
+  #         flyway info -locations=filesystem:newsie/database/flyway -url="jdbc:sqlserver://${{ env.qa_SQL_HOST }}:${{ env.qa_SQL_PORT }}/${{ env.qa_SQL_DB_NAME }}" -user=${{ secrets.SQL_ROOT_USR }} -password=${{ secrets.SQL_ROOT_PSW }}
+
+  #     - name: Applying flyway to main
+  #       if: github.ref == 'refs/heads/main'
+  #       run: |
+  #         flyway info -locations=filesystem:newsie/database/flyway -url="jdbc:sqlserver://${{ env.develop_SQL_HOST }}:${{ env.develop_SQL_PORT }}/${{ env.develop_SQL_DB_NAME }}" -user=${{ secrets.SQL_ROOT_USR }} -password=${{ secrets.SQL_ROOT_PSW }}
+  #         flyway migrate -locations=filesystem:newsie/database/flyway -url="jdbc:sqlserver://${{ env.develop_SQL_HOST }}:${{ env.develop_SQL_PORT }}/${{ env.develop_SQL_DB_NAME }}" -user=${{ secrets.SQL_ROOT_USR }} -password=${{ secrets.SQL_ROOT_PSW }} -baselineOnMigrate="true"
+  #         flyway info -locations=filesystem:newsie/database/flyway -url="jdbc:sqlserver://${{ env.develop_SQL_HOST }}:${{ env.develop_SQL_PORT }}/${{ env.develop_SQL_DB_NAME }}" -user=${{ secrets.SQL_ROOT_USR }} -password=${{ secrets.SQL_ROOT_PSW }}
+
+  deploy-app:
+    runs-on: ubuntu-latest
+    needs: [data-migration]
+    steps:
+      # Get the name of each branch where running
+      - name: "Getting name of branch 🌿"
+        id: vars
+        run: echo ::set-output name=branch::${GITHUB_REF#refs/*/} # ${{ steps.vars.outputs.branch }}
+
+      # Conencting to srv and updating Helm chart
+      - name: "Updating files charts of Helm 🔱"
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.SRV_IP_AMV }}
+          username: ${{ secrets.SRV_USER_AMV }}
+          password: ${{ secrets.SRV_PASSWORD_AMV }}
+          port: ${{ secrets.SRV_PORT_AMV }}
+          script: |
+            if [ ! -d "${{ github.event.repository.name }}" ]; then
+              git clone -b ${{ steps.vars.outputs.branch }} https://${{ secrets.GIT_USER }}:${{ secrets.GIT_PASSWORD }}@github.com/${{ github.repository }}.git
+            fi
+              cd /home/${{ secrets.SRV_USER_AMV }}/${{ github.event.repository.name }} && git fetch && git checkout ${{ steps.vars.outputs.branch }} --force && git pull
+
+      # Conencting to srv and running helm commands to initialize or upgrade charts
+      - name: "Updating Helm App 🚀"
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.SRV_IP_AMV }}
+          username: ${{ secrets.SRV_USER_AMV }}
+          password: ${{ secrets.SRV_PASSWORD_AMV }}
+          port: ${{ secrets.SRV_PORT_AMV }}
+          script: |
+            cd /home/${{ secrets.SRV_USER_AMV }}/${{ github.event.repository.name }}/manifests && \
+            sed -i 's/tag: .*/tag: ${{ github.sha }}/' values-${{ steps.vars.outputs.branch }}.yaml
+            sudo helm upgrade --install ${{ env.SERVICE }} . -n devops-${{ steps.vars.outputs.branch }} -f values-${{ steps.vars.outputs.branch }}.yaml --create-namespace --force
+
+            cd /home/${{ secrets.SRV_USER_AMV }}/${{ github.event.repository.name }}/manifests/vars  && \
+            sudo kubectl apply -f secret-${{ steps.vars.outputs.branch }}.yaml -n devops-${{ steps.vars.outputs.branch }} && \
+            sudo kubectl apply -f configmap-${{ steps.vars.outputs.branch }}.yaml -n devops-${{ steps.vars.outputs.branch }}
+
+      - name: "Notify status of failure job"
+        if: ${{ failure() }}
+        run: |
+          curl -X POST -H "Content-Type: application/json" \
+          -d '{"content": "Something in deploy in server of image 📸 ${{ env.SERVER }}/${{ env.USER }}/${{ env.IMAGE }}:${{ github.sha }} was wrong! 🚀\nStatus: `${{ job.status }}` 💥👻 \nAutor: @${{ github.actor }} \nLink: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"}' \
+          ${{ secrets.WEBHOOK_URL }}
+
+  notification:
+    runs-on: ubuntu-latest
+    needs: [deploy-app]
+    steps:
+      - name: Notify Teams
+        env:
+          WEBHOOK_URL: ${{ secrets.WEBHOOK_URL }}
+          TARGET_BRANCH: develop
+        run: |
+          curl -X POST -H "Content-Type: application/json" \
+          -d '{"content": "Build and deploy in server of image 📸 ${{ env.SERVER }}/${{ env.USER }}/${{ env.IMAGE }}:${{ github.sha }} was succesfully! 🐳🚀\nStatus: `${{ job.status }}` 🍻✅ \nAutor: @${{ github.actor }} \nLink: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"}' \
+          ${{ secrets.WEBHOOK_URL }}
