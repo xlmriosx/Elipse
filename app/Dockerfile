@@ -5,7 +5,7 @@ WORKDIR /app
 # https://+:5005; if have certificate
 ENV ASPNETCORE_URLS=http://+:5000
 # Else will throw an error for localization
-ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=true
+ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false
 
 # Copy the published application to the container
 FROM mcr.microsoft.com/dotnet/sdk:8.0.100-1-alpine3.18-amd64 AS build
@@ -22,6 +22,5 @@ RUN dotnet publish "Elipse.csproj" -c Release -o /app/publish
 # Build runtime image
 FROM base AS final
 WORKDIR /app
-ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=true
 COPY --from=publish /app/publish .
 ENTRYPOINT ["dotnet", "Elipse.dll"]
