@@ -9,8 +9,23 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddDbContext<ChatContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("ChatContext") ?? throw new InvalidOperationException("Connection string 'ChatContext' not found.")));
+
+////
+string server = _configuration["DB_SERVER"];
+string database = _configuration["DB_DATABASE"];
+string user = _configuration["DB_USER"];
+string password = _configuration["DB_PASSWORD"];
+
+string connectionString = $"Server={server};Database={database};User Id={user};Password={password};";
+
+// Use the connection string in your application, e.g., configure your database context.
+services.AddDbContext<ChatContext>(options =>
+    options.UseSqlServer(connectionString));
+
+////
+
+// builder.Services.AddDbContext<ChatContext>(options =>
+//     options.UseSqlServer(builder.Configuration.GetConnectionString("ChatContext") ?? throw new InvalidOperationException("Connection string 'ChatContext' not found.")));
 
 var app = builder.Build();
 
@@ -28,3 +43,4 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
