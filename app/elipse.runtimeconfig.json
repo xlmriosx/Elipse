@@ -1,0 +1,9 @@
+{
+    "runtimeOptions": {
+      "tfm": "netcoreapp8.0",
+      "configProperties": {
+        "System.GC.Server": true,
+        "System.Globalization.Invariant": true
+      }
+    }
+  }
