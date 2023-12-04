@@ -14,7 +14,7 @@ COPY ["Elipse.csproj", "./"]
 RUN dotnet restore "Elipse.csproj"
 COPY . .
 WORKDIR "/src/"
-RUN dotnet dev-certs https
+RUN dotnet dev-certs https --trust
 RUN dotnet build "Elipse.csproj" -c Release -o /app/build
 
 FROM build AS publish
