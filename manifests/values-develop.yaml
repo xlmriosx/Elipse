@@ -17,8 +17,8 @@ image:
 
 
 imagePullSecrets: ""
-nameOverride: "elipse"
-fullnameOverride: "elipse"
+nameOverride: "chatnet"
+fullnameOverride: "chatnet"
 
 serviceAccount:
   # Specifies whether a service account should be created
