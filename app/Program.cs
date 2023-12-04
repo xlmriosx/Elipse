@@ -1,5 +1,11 @@
 using Elipse.Models;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,12 +23,6 @@ string user = Environment.GetEnvironmentVariable("DB_USER");
 string password = Environment.GetEnvironmentVariable("DB_PASSWORD");
 
 string connectionString = $"Server={server};Database={database};User Id={user};Password={password};";
-
-// Use the connection string in your application, e.g., configure your database context.
-// services.AddDbContext<ChatContext>(options =>
-//     options.UseSqlServer(connectionString));
-
-////
 
 builder.Services.AddDbContext<ChatContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString(connectionString) ?? throw new InvalidOperationException("Connection string 'ChatContext' not found.")));
