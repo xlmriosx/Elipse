@@ -24,6 +24,8 @@ secrets:
     key: DB_USER
   - name: DB_PASSWORD
     key: DB_PASSWORD
+  - name: ConnectionStrings__DefaultConnection
+    key: ConnectionStrings__DefaultConnection
 
 imagePullSecrets: ""
 nameOverride: "chatnet"
