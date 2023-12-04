@@ -3,7 +3,7 @@ FROM mcr.microsoft.com/dotnet/aspnet:8.0-alpine3.18-amd64 AS base
 EXPOSE 5000
 WORKDIR /app
 # https://+:5005; if have certificate
-ENV ASPNETCORE_URLS=http://+:5000
+ENV ASPNETCORE_URLS=http://+:5000;https://+:5005
 # Else will throw an error for localization
 ENV ASPNETCORE_ENVIRONMENT=Production
 
