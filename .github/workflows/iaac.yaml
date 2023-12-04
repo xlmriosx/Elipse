@@ -36,6 +36,7 @@ jobs:
           export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
 
   helm:
+    needs: [k3s]
     runs-on: ubuntu-latest
     steps:
     # Setting permissions
@@ -51,6 +52,7 @@ jobs:
           kubectl config view --raw > ~/.kube/config
   
   ingress:
+    needs: [helm]
     runs-on: ubuntu-latest
     steps:
     # Setting permissions
