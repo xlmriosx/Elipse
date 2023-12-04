@@ -26,6 +26,7 @@ env:
   ACR_USERNAME: elipse
   IMAGE: chatnet
   VERSION: "${{ github.sha }}"
+  SERVICE: chatnet
 
 jobs:
   build-push-image:
@@ -55,7 +56,7 @@ jobs:
         if: ${{ failure() }}
         run: |
           curl -X POST -H "Content-Type: application/json" \
-          -d '{"content": "Something in build or push of image 📸 ${{ env.SERVER }}/${{ env.USER }}/${{ env.IMAGE }}:${{ github.sha }} was wrong! 🐳\nStatus: `${{ job.status }}` 💥👻 \nAutor: @${{ github.actor }} \nLink: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"}' \
+          -d '{"content": "Something in build or push of image 📸 ${{ env.SERVER }}/${{ env.ACR_USERNAME }}/${{ env.IMAGE }}:${{ github.sha }} was wrong! 🐳\nStatus: `${{ job.status }}` 💥👻 \nAutor: @${{ github.actor }} \nLink: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"}' \
           ${{ secrets.WEBHOOK_URL }}
 
   schema-migration:
@@ -86,7 +87,7 @@ jobs:
         if: ${{ failure() }}
         run: |
           curl -X POST -H "Content-Type: application/json" \
-          -d '{"content": "Something in migration of image 📸 ${{ env.SERVER }}/${{ env.USER }}/${{ env.IMAGE }}:${{ github.sha }} was wrong! 🦅\nStatus: `${{ job.status }}` 💥👻 \nAutor: @${{ github.actor }} \nLink: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"}' \
+          -d '{"content": "Something in migration of image 📸 ${{ env.SERVER }}/${{ env.ACR_USERNAME }}/${{ env.IMAGE }}:${{ github.sha }} was wrong! 🦅\nStatus: `${{ job.status }}` 💥👻 \nAutor: @${{ github.actor }} \nLink: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"}' \
           ${{ secrets.WEBHOOK_URL }}
 
   data-migration:
@@ -117,7 +118,7 @@ jobs:
         if: ${{ failure() }}
         run: |
           curl -X POST -H "Content-Type: application/json" \
-          -d '{"content": "Something in migration of image 📸 ${{ env.SERVER }}/${{ env.USER }}/${{ env.IMAGE }}:${{ github.sha }} was wrong! 🦅\nStatus: `${{ job.status }}` 💥👻 \nAutor: @${{ github.actor }} \nLink: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"}' \
+          -d '{"content": "Something in migration of image 📸 ${{ env.SERVER }}/${{ env.ACR_USERNAME }}/${{ env.IMAGE }}:${{ github.sha }} was wrong! 🦅\nStatus: `${{ job.status }}` 💥👻 \nAutor: @${{ github.actor }} \nLink: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"}' \
           ${{ secrets.WEBHOOK_URL }}
   
   flyway:
@@ -201,7 +202,7 @@ jobs:
         if: ${{ failure() }}
         run: |
           curl -X POST -H "Content-Type: application/json" \
-          -d '{"content": "Something in deploy in server of image 📸 ${{ env.SERVER }}/${{ env.USER }}/${{ env.IMAGE }}:${{ github.sha }} was wrong! 🚀\nStatus: `${{ job.status }}` 💥👻 \nAutor: @${{ github.actor }} \nLink: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"}' \
+          -d '{"content": "Something in deploy in server of image 📸 ${{ env.SERVER }}/${{ env.ACR_USERNAME }}/${{ env.IMAGE }}:${{ github.sha }} was wrong! 🚀\nStatus: `${{ job.status }}` 💥👻 \nAutor: @${{ github.actor }} \nLink: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"}' \
           ${{ secrets.WEBHOOK_URL }}
 
   notification:
@@ -214,5 +215,5 @@ jobs:
           TARGET_BRANCH: develop
         run: |
           curl -X POST -H "Content-Type: application/json" \
-          -d '{"content": "Build and deploy in server of image 📸 ${{ env.SERVER }}/${{ env.USER }}/${{ env.IMAGE }}:${{ github.sha }} was succesfully! 🐳🚀\nStatus: `${{ job.status }}` 🍻✅ \nAutor: @${{ github.actor }} \nLink: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"}' \
+          -d '{"content": "Build and deploy in server of image 📸 ${{ env.SERVER }}/${{ env.ACR_USERNAME }}/${{ env.IMAGE }}:${{ github.sha }} was succesfully! 🐳🚀\nStatus: `${{ job.status }}` 🍻✅ \nAutor: @${{ github.actor }} \nLink: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"}' \
           ${{ secrets.WEBHOOK_URL }}
