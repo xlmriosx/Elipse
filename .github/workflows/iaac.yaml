@@ -33,6 +33,7 @@ jobs:
         port: ${{ secrets.SRV_PORT_AMV }}
         script: |
           curl -sfL https://get.k3s.io | sh - &&
+          sudo chmod 777 -R /etc/rancher/k3s &&
           export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
 
   helm:
@@ -64,13 +65,13 @@ jobs:
         port: ${{ secrets.SRV_PORT_AMV }}
         script: |
           { # try
-            sudo helm upgrade --install ingress-nginx ingress-nginx \
+            helm upgrade --install ingress-nginx ingress-nginx \
             --repo https://kubernetes.github.io/ingress-nginx \
             --namespace ingress-nginx --create-namespace 
           } || { 
             # catch
             sudo kubectl config view --raw > ~/.kube/config &&
-            sudo helm upgrade --install ingress-nginx ingress-nginx \
+            helm upgrade --install ingress-nginx ingress-nginx \
             --repo https://kubernetes.github.io/ingress-nginx \
             --namespace ingress-nginx --create-namespace 
           }
