@@ -5,7 +5,7 @@ WORKDIR /app
 # https://+:5005; if have certificate
 ENV ASPNETCORE_URLS=http://+:5000
 # Else will throw an error for localization
-ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false
+# ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false
 
 # Copy the published application to the container
 FROM mcr.microsoft.com/dotnet/sdk:8.0.100-1-alpine3.18-amd64 AS build
