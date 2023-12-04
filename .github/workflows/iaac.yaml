@@ -50,35 +50,9 @@ jobs:
         port: ${{ secrets.SRV_PORT_AMV }}
         script: |
           sudo snap install helm --classic
-  
-  database:
-    needs: [helm]
-    runs-on: ubuntu-latest
-    steps:
-    # Setting permissions
-    - name: "Setting up ingress 📥"
-      uses: appleboy/ssh-action@v1.0.0
-      with:
-        host: ${{ secrets.SRV_IP_AMV }}
-        username: ${{ secrets.SRV_USER_AMV }}
-        password: ${{ secrets.SRV_PASSWORD_AMV }}
-        port: ${{ secrets.SRV_PORT_AMV }}
-        script: |
-          if [ ! -d "${{ github.event.repository.name }}" ]; then
-            git clone -b ${{ steps.vars.outputs.branch }} https://${{ secrets.GIT_USER }}:${{ secrets.GIT_PASSWORD }}@github.com/${{ github.repository }}.git
-          fi
-          
-          cd /home/${{ secrets.SRV_USER_AMV }}/${{ github.event.repository.name }} && git fetch && git checkout ${{ steps.vars.outputs.branch }} && git pull
-          mkdir /var/opt/mssql || echo "Alredy exists"
-          sudo chmod -R 777 /var/opt/mssql
-          cd /home/${{ secrets.SRV_USER_AMV }}/${{ github.event.repository.name }}/database  && \
-          kubectl apply -f namespace.yaml -n mssql && \
-          kubectl apply -f secret.yaml -n mssql && \
-          kubectl apply -f service.yaml -n mssql && \
-          kubectl apply -f statefulset.yaml -n mssql
 
   ingress:
-    needs: [database]
+    needs: [helm]
     runs-on: ubuntu-latest
     steps:
     # Setting permissions

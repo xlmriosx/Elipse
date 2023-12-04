@@ -1,9 +1,0 @@
----
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: devops-app
-  namespace: devops-develop
-data:
-  HOST: '0.0.0.0'
-  PORT: '3333'
