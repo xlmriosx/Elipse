@@ -6,13 +6,14 @@ replicaCount: 1
 
 image:
   repository: elipse.azurecr.io
-  name: Elipse/ChatNet
+  name: elipse/chatnet
   pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
   tag: ${{ github.sha }}
-  containerPort: 8080
+  containerPort: 5000
   livenessProbe: /swagger/index.html
   readinessProbe: /swagger/index.html
+  secret: acr-cred-develop
 
 
 imagePullSecrets: ""
