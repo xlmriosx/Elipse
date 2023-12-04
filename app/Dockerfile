@@ -14,6 +14,7 @@ COPY ["Elipse.csproj", "./"]
 RUN dotnet restore "Elipse.csproj"
 COPY . .
 WORKDIR "/src/"
+RUN dotnet dev-certs https
 RUN dotnet build "Elipse.csproj" -c Release -o /app/build
 
 FROM build AS publish
@@ -23,6 +24,5 @@ RUN dotnet publish "Elipse.csproj" -c Release -o /app/publish
 FROM base AS final
 WORKDIR /app
 ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=true
-RUN dotnet dev-certs https
 COPY --from=publish /app/publish .
 ENTRYPOINT ["dotnet", "Elipse.dll"]
