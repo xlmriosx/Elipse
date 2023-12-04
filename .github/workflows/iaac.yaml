@@ -63,8 +63,15 @@ jobs:
         password: ${{ secrets.SRV_PASSWORD_AMV }}
         port: ${{ secrets.SRV_PORT_AMV }}
         script: |
-          sudo helm upgrade --install ingress-nginx ingress-nginx \
+          { # try
+            sudo helm upgrade --install ingress-nginx ingress-nginx \
             --repo https://kubernetes.github.io/ingress-nginx \
-            --namespace ingress-nginx --create-namespace &&
-          sudo kubectl config view --raw > ~/.kube/config
+            --namespace ingress-nginx --create-namespace 
+          } || { 
+            # catch
+            sudo kubectl config view --raw > ~/.kube/config
+            sudo helm upgrade --install ingress-nginx ingress-nginx \
+            --repo https://kubernetes.github.io/ingress-nginx \
+            --namespace ingress-nginx --create-namespace 
+          }
   
