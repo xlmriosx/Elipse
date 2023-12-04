@@ -191,11 +191,11 @@ jobs:
           script: |
             cd /home/${{ secrets.SRV_USER_AMV }}/${{ github.event.repository.name }}/manifests && \
             sed -i 's/tag: .*/tag: ${{ github.sha }}/' values-${{ steps.vars.outputs.branch }}.yaml
-            sudo helm upgrade --install ${{ env.SERVICE }} . -n devops-${{ steps.vars.outputs.branch }} -f values-${{ steps.vars.outputs.branch }}.yaml --create-namespace --force
+            helm upgrade --install ${{ env.SERVICE }} . -n devops-${{ steps.vars.outputs.branch }} -f values-${{ steps.vars.outputs.branch }}.yaml --create-namespace --force
 
             cd /home/${{ secrets.SRV_USER_AMV }}/${{ github.event.repository.name }}/manifests/vars  && \
-            sudo kubectl apply -f secret-${{ steps.vars.outputs.branch }}.yaml -n devops-${{ steps.vars.outputs.branch }} && \
-            sudo kubectl apply -f configmap-${{ steps.vars.outputs.branch }}.yaml -n devops-${{ steps.vars.outputs.branch }}
+            kubectl apply -f secret-${{ steps.vars.outputs.branch }}.yaml -n devops-${{ steps.vars.outputs.branch }} && \
+            kubectl apply -f configmap-${{ steps.vars.outputs.branch }}.yaml -n devops-${{ steps.vars.outputs.branch }}
 
       - name: "Notify status of failure job"
         if: ${{ failure() }}
