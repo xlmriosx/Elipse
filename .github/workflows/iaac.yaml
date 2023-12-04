@@ -1,0 +1,78 @@
+name: aprovision-kubernetes-structure
+
+# This workflow uses actions that are not certified by GitHub.
+# They are provided by a third-party and are governed by
+# separate terms of service, privacy policy, and support
+# documentation.
+
+on:
+  push:
+    branches: [ "iaac" ]
+  pull_request:
+    branches: [ "iaac" ]
+  workflow_dispatch:
+    inputs:
+      # Allow manual triggering of a workflow run.
+      # This is useful for testing and debugging.
+      manual_trigger:
+        description: 'Trigger a workflow aprovision mysql manually'
+        required: false
+        default: 'false'
+
+jobs:
+  k3s:
+    runs-on: ubuntu-latest
+    steps:
+    # Setting permissions
+    - name: "Setting up k3s 🔱"
+      uses: appleboy/ssh-action@v1.0.0
+      with:
+        host: ${{ secrets.SRV_IP_AMV }}
+        username: ${{ secrets.SRV_USER_AMV }}
+        password: ${{ secrets.SRV_PASSWORD_AMV }}
+        port: ${{ secrets.SRV_PORT_AMV }}
+        script: |
+          curl -sfL https://get.k3s.io | sh - &&
+          sudo chmod 777 -R /etc/rancher/k3s &&
+          export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
+
+  helm:
+    needs: [k3s]
+    runs-on: ubuntu-latest
+    steps:
+    # Setting permissions
+    - name: "Setting up helm 🕸"
+      uses: appleboy/ssh-action@v1.0.0
+      with:
+        host: ${{ secrets.SRV_IP_AMV }}
+        username: ${{ secrets.SRV_USER_AMV }}
+        password: ${{ secrets.SRV_PASSWORD_AMV }}
+        port: ${{ secrets.SRV_PORT_AMV }}
+        script: |
+          sudo snap install helm --classic
+  
+  ingress:
+    needs: [helm]
+    runs-on: ubuntu-latest
+    steps:
+    # Setting permissions
+    - name: "Setting up ingress 📥"
+      uses: appleboy/ssh-action@v1.0.0
+      with:
+        host: ${{ secrets.SRV_IP_AMV }}
+        username: ${{ secrets.SRV_USER_AMV }}
+        password: ${{ secrets.SRV_PASSWORD_AMV }}
+        port: ${{ secrets.SRV_PORT_AMV }}
+        script: |
+          { # try
+            helm upgrade --install ingress-nginx ingress-nginx \
+            --repo https://kubernetes.github.io/ingress-nginx \
+            --namespace ingress-nginx --create-namespace 
+          } || { 
+            # catch
+            sudo kubectl config view --raw > ~/.kube/config &&
+            helm upgrade --install ingress-nginx ingress-nginx \
+            --repo https://kubernetes.github.io/ingress-nginx \
+            --namespace ingress-nginx --create-namespace 
+          }
+  
