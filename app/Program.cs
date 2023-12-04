@@ -16,8 +16,15 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+string dbHost = Environment.GetEnvironmentVariable("DB_HOST");
+string dbDataBase = Environment.GetEnvironmentVariable("DB_DATABASE");
+string dbUsername = Environment.GetEnvironmentVariable("DB_USERNAME");
+string dbPassword = Environment.GetEnvironmentVariable("DB_PASSWORD");
+
+string connectionString = $"Server={dbHost};Database={dbDataBase};User Id={dbUsername};Password={dbPassword};";
+
 builder.Services.AddDbContext<ChatContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("ChatContext") ?? throw new InvalidOperationException("Connection string 'ChatContext' not found.")));
+    options.UseSqlServer(builder.Configuration.GetConnectionString(connectionString) ?? throw new InvalidOperationException("Connection string 'ChatContext' not found.")));
 
 var app = builder.Build();
 

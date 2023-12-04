@@ -3,7 +3,7 @@ FROM mcr.microsoft.com/dotnet/aspnet:8.0-alpine3.18-amd64 AS base
 EXPOSE 5000
 WORKDIR /app
 # https://+:5005; if have certificate
-ENV ASPNETCORE_URLS=http://+:5000;https://+:5005
+ENV ASPNETCORE_URLS=http://+:5000
 # Else will throw an error for localization
 ENV ASPNETCORE_ENVIRONMENT=Production
 
@@ -14,7 +14,6 @@ COPY ["Elipse.csproj", "./"]
 RUN dotnet restore "Elipse.csproj"
 COPY . .
 WORKDIR "/src/"
-RUN dotnet dev-certs https --trust
 RUN dotnet build "Elipse.csproj" -c Release -o /app/build
 
 FROM build AS publish
