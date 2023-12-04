@@ -1,9 +1,8 @@
-namespace Elipse
+﻿namespace Elipse.DTO
 {
-    public class Chat
+    public class ChatOutputDto
     {
         public int Id { get; set; }
-
         public string? Text { get; set; }
     }
 }
