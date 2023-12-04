@@ -11,10 +11,10 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 ////
-string server = _configuration["DB_SERVER"];
-string database = _configuration["DB_DATABASE"];
-string user = _configuration["DB_USER"];
-string password = _configuration["DB_PASSWORD"];
+string server = Environment.GetEnvironmentVariable("DB_SERVER");
+string database = Environment.GetEnvironmentVariable("DB_DATABASE");
+string user = Environment.GetEnvironmentVariable("DB_USER");
+string password = Environment.GetEnvironmentVariable("DB_PASSWORD");
 
 string connectionString = $"Server={server};Database={database};User Id={user};Password={password};";
 
