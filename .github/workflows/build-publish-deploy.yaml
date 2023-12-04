@@ -23,8 +23,8 @@ on:
 
 env:
   SERVER: elipse.azurecr.io
-  ACR_USERNAME: Elipse
-  IMAGE: ChatNet
+  ACR_USERNAME: elipse
+  IMAGE: chatnet
   VERSION: "${{ github.sha }}"
 
 jobs:
