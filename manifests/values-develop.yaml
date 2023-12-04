@@ -62,12 +62,12 @@ ingress:
   enabled: true
   className: "nginx"
   annotations: # {}
-    kubernetes.io/ingress.class: nginx
-    # kubernetes.io/tls-acme: "true"
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
   hosts:
     - host: 
       paths:
-        - path: /swagger/index.html
+        - path: /develop(/|$)(.*)
           pathType: Prefix
   tls: []
   #  - secretName: chart-example-tls
