@@ -188,7 +188,7 @@ jobs:
               cd /home/${{ secrets.SRV_USER_AMV }}/${{ github.event.repository.name }} && git fetch && git checkout ${{ steps.vars.outputs.branch }} --force && git pull
 
       # Conencting to srv and running helm commands to initialize or upgrade charts
-      - name: "Updating Helm App 🚀"
+      - name: "Deploying Helm App 🚀"
         uses: appleboy/ssh-action@v1.0.0
         with:
           host: ${{ secrets.SRV_IP_AMV }}
