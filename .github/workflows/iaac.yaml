@@ -71,7 +71,7 @@ jobs:
           cd /home/${{ secrets.SRV_USER_AMV }}/${{ github.event.repository.name }} && git fetch && git checkout ${{ steps.vars.outputs.branch }} && git pull
           mkdir /var/opt/mssql || echo "Alredy exists"
           sudo chmod -R 777 /var/opt/mssql
-          cd /home/${{ github.event.repository.name }}/database  && \
+          cd /home/${{ secrets.SRV_USER_AMV }}/${{ github.event.repository.name }}/database  && \
           kubectl apply -f namespace.yaml -n mssql && \
           kubectl apply -f secret.yaml -n mssql && \
           kubectl apply -f service.yaml -n mssql && \
