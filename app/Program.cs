@@ -19,13 +19,13 @@ string password = Environment.GetEnvironmentVariable("DB_PASSWORD");
 string connectionString = $"Server={server};Database={database};User Id={user};Password={password};";
 
 // Use the connection string in your application, e.g., configure your database context.
-services.AddDbContext<ChatContext>(options =>
-    options.UseSqlServer(connectionString));
+// services.AddDbContext<ChatContext>(options =>
+//     options.UseSqlServer(connectionString));
 
 ////
 
-// builder.Services.AddDbContext<ChatContext>(options =>
-//     options.UseSqlServer(builder.Configuration.GetConnectionString("ChatContext") ?? throw new InvalidOperationException("Connection string 'ChatContext' not found.")));
+builder.Services.AddDbContext<ChatContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString(connectionString) ?? throw new InvalidOperationException("Connection string 'ChatContext' not found.")));
 
 var app = builder.Build();
 
