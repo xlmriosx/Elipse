@@ -69,7 +69,7 @@ jobs:
             --namespace ingress-nginx --create-namespace 
           } || { 
             # catch
-            sudo kubectl config view --raw > ~/.kube/config
+            sudo kubectl config view --raw > ~/.kube/config &&
             sudo helm upgrade --install ingress-nginx ingress-nginx \
             --repo https://kubernetes.github.io/ingress-nginx \
             --namespace ingress-nginx --create-namespace 
