@@ -69,6 +69,8 @@ ingress:
       paths:
         - path: /develop(/|$)(.*)
           pathType: Prefix
+        - path: /api/Chat(/|$)(.*)
+          pathType: Prefix
   tls: []
   #  - secretName: chart-example-tls
   #    hosts:
